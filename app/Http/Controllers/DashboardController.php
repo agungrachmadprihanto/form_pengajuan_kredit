@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\NasabahDataTable;
+use App\Exports\NasabahExport;
 use App\Models\Nasabah;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class DashboardController extends Controller
@@ -29,7 +32,14 @@ class DashboardController extends Controller
                     ->make(true);
         }                
 
-        return view('dashboard.index');
+        $month = Carbon::now()->month;
+        $previousMonth = Carbon::now()->subMonth()->month;
+        $now = Nasabah::whereMonth('created_at', $month)->count();
+        $beforeMonth = Nasabah::whereMonth('created_at', $previousMonth)->count();
+        $total = Nasabah::count();
+        // dd($now);
+
+        return view('dashboard.index', ['now' => $now, 'before' => $beforeMonth, 'total' => $total]);
     }
 
     public function pengajuan(Request $request)
@@ -133,5 +143,24 @@ class DashboardController extends Controller
 
         return view('dashboard.show', ['data' => $data]);
     }
+
+    public function laporan(Request $request)
+    {
+        return view('dashboard.laporan');
+    }
+
+    public function downloadReport(Request $request)
+    {
+        $validate = $request->validate([
+            'from_date' => 'required',
+            'to_date' => 'required'
+        ]);
+
+        $from_date = $request->from_date;
+        $to_date = $request->to_date;
+
+        return Excel::download(new NasabahExport($from_date, $to_date), 'laporan.xlsx');
+    }
+
 
 }

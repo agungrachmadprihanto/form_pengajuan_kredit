@@ -28,6 +28,10 @@ Route::prefix('dashboard')->middleware('auth')->group(function(){
     Route::get('/pengajuan', [DashboardController::class, 'pengajuan'])->name('dash.pengajuan');
     Route::get('/pengajuan/{id}', [DashboardController::class, 'show'])->name('dash.show');
     Route::get('/word/{id}', [DashboardController::class, 'downloadWord'])->name('dash.download');
+
+    Route::get('/laporan', [DashboardController::class, 'laporan'])->name('dash.laporan');
+    Route::get('/downloadExcel', [DashboardController::class, 'downloadReport'])->name('dash.download');
+    
     Route::get('/generate', [DashboardController::class, 'generete'])->name('dash.generate');
 
 });
